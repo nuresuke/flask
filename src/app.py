@@ -1,65 +1,55 @@
-# -*- coding: utf-8 -*-
-"""Webアプリのサンプルです"""
-
-# ライブラリのインポート
-from datetime import datetime, timedelta
-
-from flask import Flask, render_template, request
-from markupsafe import Markup
-
-import omikuji
-import school_timetable
-import weather_forecast
-
-# Flaskのインスタンス化
-application = Flask(__name__, static_folder="static", template_folder="templates")
+from flask import Flask, render_template, request, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 
 
-@application.route("/")
-@application.route("/index")
-def index() -> str:
-    """トップページ
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+db = SQLAlchemy(app)
 
-    Returns:
-        str: レンダリング結果
-    """
-    return render_template("./index.html")
+class Todo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100))
 
 
-@application.route("/tomorrow_plan", methods=["GET", "POST"])
-def tomorrow_plan() -> str:
-    """明日の予定を表示する
+### タスクを表示する ###
+@app.route("/", methods=["GET", "POST"])
+def home():
+    # データベースから全てのTodoレコードを取得
+    todo_list = Todo.query.all()
+    # 取得したTodoリストを"index.html"テンプレートに渡し、ウェブページとして表示
+    return render_template("index.html", todo_list=todo_list)
 
-    Returns:
-        str: レンダリング結果
-    """
-    # 明日の日付（曜日表示付き）
-    DAY_NAME = "月火水木金土日"
-    tomorrow_dt = datetime.now() + timedelta(days=1)
-    tomorrow_dt_str = f"{tomorrow_dt.strftime('%Y/%m/%d')}({DAY_NAME[tomorrow_dt.weekday()]})"
 
-    # 明日の天気予報
-    weather_osaka = weather_forecast.get_osaka_tomorrow_weather()
+### タスク追加 ###
+@app.route("/add", methods=["POST"])
+def add():
+    # ユーザーから送信されたフォームデータからタイトルを取得
+    title = request.form.get("title")
+    # 新しいTodoオブジェクトを作成
+    new_todo = Todo(title=title)
+    # 新しいTodoをデータベースセッションに追加
+    db.session.add(new_todo)
+    # 変更をデータベースにコミット
+    db.session.commit()
+    # タスク追加後、ホームページにリダイレクト
+    return redirect(url_for("home"))
 
-    # 明日の時間割
-    tomorrow_lessons = school_timetable.get_tomorrow_timetable()
-    timetable = [[lesson.period, lesson.subject, lesson.classroom, lesson.teacher] for lesson in tomorrow_lessons]
 
-    # おみくじを引く
-    if request.method == "POST":
-        fortune = omikuji.draw()
-        fortune_result = fortune.result.value
-        fortune_advice = fortune.advice
-    else:  # GET
-        fortune_result = ""
-        fortune_advice = ""
+### タスク削除 ###
+@app.route("/delete/<int:todo_id>", methods=["POST"])
+def delete(todo_id):
+    # URLから渡されたIDに基づいて、該当するTodoをデータベースから取得
+    todo = Todo.query.filter_by(id=todo_id).first()
+    # 取得したTodoをデータベースセッションから削除
+    db.session.delete(todo)
+    # 変更をデータベースにコミット
+    db.session.commit()
+    # タスク削除後、ホームページにリダイレクト
+    return redirect(url_for("home"))
 
-    return render_template(
-        "./tomorrow_plan.html",
-        date=tomorrow_dt_str,
-        weather_area="大阪",
-        weather_result=weather_osaka,
-        school_timetable=timetable,
-        fortune_result=fortune_result,
-        fortune_advice=Markup(fortune_advice.replace("\n", "<br>")),
-    )
+
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
+

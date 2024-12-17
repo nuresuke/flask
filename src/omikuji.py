@@ -18,7 +18,6 @@ class FortuneLevel(Enum):
     KYO = "凶"
     DAIKYO = "大凶"
 
-
 @dataclass
 class Fortune:
     """おみくじの結果を表すデータクラス"""

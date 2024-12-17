@@ -1,17 +1,26 @@
 <!DOCTYPE html>
-<html lang="ja">
-
+<html>
 <head>
-    <!-- Required meta tags -->
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>トップページ</title>
+    <title>Todo App</title>
+    <link rel="stylesheet" href="../static/style.css">
 </head>
-
 <body>
-    <h1>大阪情報専門学校 2024 Linuxサーバ構築 (R3SC)</h1>
-    <a href="tomorrow_plan">明日の予定</a>
+    <div class="container">
+        <h1>Todo App</h1>
+        <form method="POST" action="/add">
+            <input type="text" name="title" id="title" placeholder="Add Todo" required>
+            <button type="submit">Add</button>
+        </form>
+        <ul>
+            {% for todo in todo_list %}
+            <li>
+                {{ todo.title }}
+                <form method="POST" action="/delete/{{ todo.id }}">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
-
 </html>
