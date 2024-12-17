@@ -34,7 +34,7 @@ def tomorrow_plan() -> str:
         str: レンダリング結果
     """
     # 明日の日付（曜日表示付き）
-    DAY_NAME = "月火水木金土日"
+    DAY_NAME = "月火水木金土日つｊ"
     tomorrow_dt = datetime.now() + timedelta(days=1)
     tomorrow_dt_str = f"{tomorrow_dt.strftime('%Y/%m/%d')}({DAY_NAME[tomorrow_dt.weekday()]})"
 
