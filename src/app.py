@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for
+import requests
+from bs4 import BeautifulSoup
+from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
-
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite"
 db = SQLAlchemy(app)
+
 
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,16 +21,6 @@ def home():
     # 取得したTodoリストを"index.html"テンプレートに渡し、ウェブページとして表示
     return render_template("index.html", todo_list=todo_list)
 
-<<<<<<< HEAD
-=======
-    Returns:
-        str: レンダリング結果
-    """
-    # 明日の日付（曜日表示付き）
-    DAY_NAME = "月火水木金土日つｊ"
-    tomorrow_dt = datetime.now() + timedelta(days=1)
-    tomorrow_dt_str = f"{tomorrow_dt.strftime('%Y/%m/%d')}({DAY_NAME[tomorrow_dt.weekday()]})"
->>>>>>> e4e7eeadce2ce59483296a722c2f9266d71d08c3
 
 ### タスク追加 ###
 @app.route("/add", methods=["POST"])
@@ -63,3 +55,11 @@ if __name__ == "__main__":
         db.create_all()
     app.run(debug=True)
 
+
+def scrape_website(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, "html.parser")
+
+    # ここでは、例としてタイトルタグを取得します
+    title = soup.find("title").get_text()
+    return title
