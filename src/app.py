@@ -1,6 +1,4 @@
-import requests
-from bs4 import BeautifulSoup
-from flask import Flask, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 import omikuji
@@ -81,28 +79,6 @@ def example():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-def scrape_website(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, "html.parser")
-
-    # ここでは、例としてタイトルタグを取得します
-    title = soup.find("title").get_text()
-    return title
-
-
-@app.route("/scrape", methods=["GET"])
-def scrape():
-    url = request.args.get("url")
-    if not url:
-        return jsonify({"error": "URL parameter is required"}), 400
-
-    try:
-        title = scrape_website(url)
-        return jsonify({"title": title})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
