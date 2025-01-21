@@ -1,5 +1,4 @@
 body {
-  background-color: #fff;
   font-family: Arial, sans-serif;
   color: #333;
   margin: 0;
@@ -12,11 +11,22 @@ body {
 
 
 .container {
+  background: linear-gradient(270deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
+  background-size: 1400% 1400%;
+  animation: rainbow 10s ease infinite;
   text-align: center;
   width: 500px;
   box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.15);
   padding: 30px;
   border-radius: 15px;
+}
+@keyframes rainbow {
+  0%, 100% {
+      background-position: 0% 50%;
+  }
+  50% {
+      background-position: 100% 50%;
+  }
 }
 
 
@@ -52,9 +62,8 @@ button {
   transition: background-color 0.3s;
 }
 
-
 button:hover {
-  background-color: #e04040;
+  background-color: #82415e;
 }
 
 
@@ -73,8 +82,19 @@ li {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #228B22; /* 草の色 */
+  border-radius: 5px;
+  animation: sway 2s infinite ease-in-out;
 }
 
+@keyframes sway {
+  0%, 100% {
+      transform: rotate(0deg);
+  }
+  50% {
+      transform: rotate(360deg);
+  }
+}
 
 li form {
   display: inline;

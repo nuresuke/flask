@@ -1,10 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
+
+import omikuji
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite"
+app.secret_key = "your_secret_key"
 db = SQLAlchemy(app)
 
 
@@ -13,13 +16,20 @@ class Todo(db.Model):
     title = db.Column(db.String(100))
 
 
+with app.app_context():
+    db.create_all()
+
+
 ### タスクを表示する ###
 @app.route("/", methods=["GET", "POST"])
 def home():
-    # データベースから全てのTodoレコードを取得
     todo_list = Todo.query.all()
+    fortune_result = session.get("fortune_result", "")
+    fortune_advice = session.get("fortune_advice", "")
     # 取得したTodoリストを"index.html"テンプレートに渡し、ウェブページとして表示
-    return render_template("index.html", todo_list=todo_list)
+    return render_template(
+        "./index.html", todo_list=todo_list, fortune_result=fortune_result, fortune_advice=fortune_advice
+    )
 
 
 ### タスク追加 ###
@@ -50,9 +60,26 @@ def delete(todo_id):
     return redirect(url_for("home"))
 
 
+@app.route("/example", methods=["POST"])
+def example():
+    fortune_result = ""
+    fortune_advice = ""
+
+    if request.method == "POST":
+        fortune = omikuji.draw()
+        fortune_result = fortune.result.value
+        fortune_advice = fortune.advice
+        session["fortune_result"] = fortune_result
+        session["fortune_advice"] = fortune_advice
+    else:
+        fortune_result = ""
+        fortune_advice = ""
+
+    todos = Todo.query.all()
+    return render_template("index.html", todo_list=todos, fortune_result=fortune_result, fortune_advice=fortune_advice)
+
+
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
 
 
@@ -63,3 +90,20 @@ def scrape_website(url):
     # ここでは、例としてタイトルタグを取得します
     title = soup.find("title").get_text()
     return title
+
+
+@app.route("/scrape", methods=["GET"])
+def scrape():
+    url = request.args.get("url")
+    if not url:
+        return jsonify({"error": "URL parameter is required"}), 400
+
+    try:
+        title = scrape_website(url)
+        return jsonify({"title": title})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -6,12 +6,28 @@
 </head>
 <body>
     <div class="container">
+    <form method="POST" action ="/example">
+        <div class="text-center">
+            {% if fortune_result %}
+            <span class="badge bg-info mb-3 p-2" style="font-size: 2.0rem;">{{ fortune_result
+                }}</span>
+            <p class="mb-3">{{ fortune_advice }}</p>
+            {% endif %}
+            <button class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-sync-alt me-2"></i>
+                くじを引く
+            </button>
+        </div>
+    </div>
+    </form>
+    <div class="container">
         <h1>Todo App</h1>
         <form method="POST" action="/add">
             <input type="text" name="title" id="title" placeholder="Add Todo" required>
             <button type="submit">Add</button>
         </form>
         <ul>
+            
             {% for todo in todo_list %}
             <li>
                 {{ todo.title }}
