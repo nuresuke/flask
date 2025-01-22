@@ -27,7 +27,7 @@
             <button type="submit">Add</button>
         </form>
         <ul>
-            
+            <div class="lightning">
             {% for todo in todo_list %}
             <li>
                 {{ todo.title }}
@@ -36,6 +36,7 @@
                 </form>
             </li>
             {% endfor %}
+            </div>
         </ul>
     </div>
 </body>
