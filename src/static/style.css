@@ -60,19 +60,28 @@ button {
   color: #fff;
   cursor: pointer;
   transition: background-color 0.3s;
+  animation: sway 2s infinite ease-in-out;
 }
 
 button:hover {
   background-color: #82415e;
 }
 
-
+.mb-3{
+  font-size: 32px;
+  color: black; /* 文字の色 */
+            -webkit-text-stroke: 0.5px white; /* 文字の縁取り */
+}
 ul {
   list-style: none;
   padding-left: 0;
   margin: 40px 0 15px;
 }
-
+h1{
+  font-size: 32px;
+  color: black; /* 文字の色 */
+            -webkit-text-stroke: 0.5px white; /* 文字の縁取り */
+}
 
 li {
   background-color: #f5f5f5;
@@ -82,9 +91,23 @@ li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #228B22; /* 草の色 */
   border-radius: 5px;
-  animation: sway 2s infinite ease-in-out;
+}
+.lightning {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 70%);
+  animation: flash 3s infinite;
+}
+
+@keyframes flash {
+  0%, 20%, 40%, 60%, 80%, 100% {
+      opacity: 0;
+  }
+  10%, 30%, 50%, 70%, 90% {
+      opacity: 1;
+  }
 }
 
 @keyframes sway {
@@ -92,7 +115,7 @@ li {
       transform: rotate(0deg);
   }
   50% {
-      transform: rotate(360deg);
+      transform: rotate(10000deg);
   }
 }
 
