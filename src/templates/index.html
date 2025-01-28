@@ -39,5 +39,46 @@
             </div>
         </ul>
     </div>
+    <h1>Othello Game</h1>
+    <p>Current Turn: <span id="current-turn">{{ current_turn }}</span></p>
+    <table>
+        {% for y in range(8) %}
+        <tr>
+            {% for x in range(8) %}
+            <td class="cell {% if (x, y) in valid_moves %}valid-move{% endif %}" data-x="{{ x }}" data-y="{{ y }}">
+                {% if board[y][x] == 'B' %}
+                <div class="black"></div>
+                {% elif board[y][x] == 'W' %}
+                <div class="white"></div>
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    <script>
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.addEventListener('click', function() {
+                const x = this.getAttribute('data-x');
+                const y = this.getAttribute('data-y');
+
+                fetch('/move', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `x=${x}&y=${y}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Invalid move!');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
